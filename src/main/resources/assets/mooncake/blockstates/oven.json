@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=0": { "model": "mooncake:oven" },
+        "facing=1": { "model": "mooncake:oven", "y": 180 },
+        "facing=2":  { "model": "mooncake:oven", "y": 270 },
+        "facing=3":  { "model": "mooncake:oven", "y": 90 }
+    }
+}
