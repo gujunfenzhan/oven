@@ -6,11 +6,16 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityOven
 extends TileEntity
@@ -19,7 +24,28 @@ implements ITickable {
     public int max_burnTime = 0;
     public int progress = 0;
     public static int PROGRESS = 200;
-    public ItemStackHandler itemStackHandler = new ItemStackHandler(7);
+    public ItemStackHandler itemStackHandler = new ItemStackHandler(7){
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            switch (slot){
+                case 0:
+                    return ranliao.isItemValid(stack);
+                case 1:
+                    return slot1.isItemValid(stack);
+                case 2:
+                    return slot2.isItemValid(stack);
+                case 3:
+                    return slot3.isItemValid(stack);
+                case 4:
+                    return slot4.isItemValid(stack);
+                case 5:
+                    return slot5.isItemValid(stack);
+                case 6:
+                    return slot6.isItemValid(stack);
+            }
+            return super.isItemValid(slot, stack);
+        }
+    };
     public SlotItemHandler ranliao = new SlotItemHandler(itemStackHandler,0,15,39){
         @Override
         public boolean isItemValid(@Nonnull ItemStack stack) {
@@ -140,5 +166,62 @@ implements ITickable {
             this.markDirty();
         }
 
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        if(capability== CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
+            return true;
+        }
+        return super.hasCapability(capability,facing);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if(capability==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new IItemHandler() {
+                @Override
+                public int getSlots() {
+                    return itemStackHandler.getSlots();
+                }
+
+                @Nonnull
+                @Override
+                public ItemStack getStackInSlot(int slot) {
+                    return itemStackHandler.getStackInSlot(slot);
+                }
+
+                @Nonnull
+                @Override
+                public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                    if(itemStackHandler.isItemValid(slot,stack)){
+                        return itemStackHandler.insertItem(slot,stack,simulate);
+                    }
+                    return stack;
+                }
+
+                @Nonnull
+                @Override
+                public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                    if(slot==4||slot==5||slot==6){
+                        return itemStackHandler.extractItem(slot,amount,simulate);
+                    }
+                    return ItemStack.EMPTY;
+                }
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return itemStackHandler.getSlotLimit(slot);
+                }
+
+                @Override
+                public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                    return false;
+                }
+            });
+
+        }
+        return super.getCapability(capability,facing);
     }
 }

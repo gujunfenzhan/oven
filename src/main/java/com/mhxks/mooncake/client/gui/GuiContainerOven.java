@@ -39,7 +39,7 @@ extends GuiContainer {
         int MAX_BURNTIME = containerOven.tileEntityOven.max_burnTime;
 
 
-        if(burnTime>0) {
+        if(progress>0) {
             this.drawTexturedModalRect(offSetX + 79, offsetY + 34, 176, 14, (int) ((float)progress / TileEntityOven.PROGRESS*24), 17);
         }
         if(burnTime>0){
